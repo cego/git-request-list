@@ -19,19 +19,16 @@ type Client struct {
 	verbose bool
 }
 
-func New(host, user, token string) (*Client, error) {
+func New(host, user, token string, verbose bool) (*Client, error) {
 	c := Client{}
 
 	c.http = http.Client{}
 	c.host = host
 	c.user = user
 	c.token = token
+	c.verbose = verbose
 
 	return &c, nil
-}
-
-func (c *Client) SetVerbose(v bool) {
-	c.verbose = v
 }
 
 func (c *Client) GetRequests() ([]gitrequest.Request, error) {

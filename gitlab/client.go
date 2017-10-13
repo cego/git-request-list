@@ -23,12 +23,13 @@ type repository struct {
 	ID   int    `json:"id"`
 }
 
-func New(host, token string, skipWIP bool) (*Client, error) {
+func New(host, token string, skipWIP bool, verbose bool) (*Client, error) {
 	c := Client{}
 
 	c.http = http.Client{}
 	c.host = host
 	c.token = token
+	c.verbose = verbose
 	c.skipWIP = skipWIP
 
 	return &c, nil

@@ -29,23 +29,20 @@ func main() {
 	for _, sConf := range conf.Sources {
 		var source interface {
 			GetRequests() ([]gitrequest.Request, error)
-			SetVerbose(bool)
 		}
 
 		switch sConf.API {
 		case "gitlab":
-			source, err = gitlab.New(sConf.Host, sConf.Token, sConf.SkipWIP)
+			source, err = gitlab.New(sConf.Host, sConf.Token, sConf.SkipWIP, *verbose)
 			break
 		case "github":
-			source, err = github.New(sConf.Host, sConf.User, sConf.Token)
+			source, err = github.New(sConf.Host, sConf.User, sConf.Token, *verbose)
 			break
 		}
 
 		if err != nil {
 			panic(err)
 		}
-
-		source.SetVerbose(*verbose)
 
 		sRequests, err := source.GetRequests()
 		if err != nil {
