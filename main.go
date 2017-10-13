@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/cego/git-request-list/github"
@@ -9,6 +10,9 @@ import (
 )
 
 func main() {
+	verbose := flag.Bool("v", false, "verbose")
+	flag.Parse()
+
 	conf, err := readConfig("conf.yml")
 	if err != nil {
 		panic(err)
@@ -24,6 +28,7 @@ func main() {
 	for _, sConf := range conf.Sources {
 		var source interface {
 			GetRequests() ([]gitrequest.Request, error)
+			SetVerbose(bool)
 		}
 
 		switch sConf.API {
@@ -38,6 +43,8 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+
+		source.SetVerbose(*verbose)
 
 		sRequests, err := source.GetRequests()
 		if err != nil {

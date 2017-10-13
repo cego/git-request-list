@@ -11,9 +11,10 @@ import (
 )
 
 type Client struct {
-	http  http.Client
-	host  string
-	token string
+	http    http.Client
+	host    string
+	token   string
+	verbose bool
 }
 
 type repository struct {
@@ -29,6 +30,10 @@ func New(host, token string) (*Client, error) {
 	c.token = token
 
 	return &c, nil
+}
+
+func (c *Client) SetVerbose(v bool) {
+	c.verbose = v
 }
 
 func (c *Client) GetRequests() ([]gitrequest.Request, error) {
@@ -120,7 +125,9 @@ func (c *Client) getRequests(repos int) ([]Request, error) {
 }
 
 func (c *Client) get(method string, path string) (*http.Response, error) {
-	log.Printf("%s %s/api/v4%s", c.host, method, path)
+	if c.verbose {
+		log.Printf("%s %s/api/v4%s", c.host, method, path)
+	}
 
 	req, err := http.NewRequest(method, c.host+"/api/v4"+path, nil)
 	if err != nil {

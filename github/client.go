@@ -12,10 +12,11 @@ import (
 )
 
 type Client struct {
-	http  http.Client
-	host  string
-	user  string
-	token string
+	http    http.Client
+	host    string
+	user    string
+	token   string
+	verbose bool
 }
 
 func New(host, user, token string) (*Client, error) {
@@ -39,6 +40,10 @@ func (c *Client) SetToken(t string) {
 
 func (c *Client) SetHost(h string) {
 	c.host = h
+}
+
+func (c *Client) SetVerbose(v bool) {
+	c.verbose = v
 }
 
 func (c *Client) GetRequests() ([]gitrequest.Request, error) {
@@ -117,7 +122,9 @@ func (c *Client) get(path string) (*http.Response, error) {
 		host = c.host
 	}
 
-	log.Printf("GET %s%s", host, path)
+	if c.verbose {
+		log.Printf("GET %s%s", host, path)
+	}
 
 	req, err := http.NewRequest("GET", host+path, nil)
 	if err != nil {
