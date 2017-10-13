@@ -1,14 +1,14 @@
 package gitrequest
 
 import (
-    "time"
+	"time"
 )
 
 type Request interface {
-    Repository() string
-    Name() string
-    State() string
-    URL() string
-    Created() time.Time
-    Updated() time.Time
+	Repository() string
+	Name() string
+	State() string
+	URL() string
+	Created() time.Time
+	Updated() time.Time
 }
