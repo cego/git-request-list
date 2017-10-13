@@ -9,10 +9,11 @@ import (
 
 type config struct {
 	Sources []struct {
-		API   string `yaml:"api"`
-		Host  string `yaml:"host"`
-		User  string `yaml:"user"`
-		Token string `yaml:"token"`
+		API     string `yaml:"api"`
+		Host    string `yaml:"host"`
+		User    string `yaml:"user"`
+		Token   string `yaml:"token"`
+		SkipWIP bool   `yaml:"skip_wip"`
 	} `yaml:"sources"`
 }
 

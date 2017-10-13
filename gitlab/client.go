@@ -15,6 +15,7 @@ type Client struct {
 	host    string
 	token   string
 	verbose bool
+	skipWIP bool
 }
 
 type repository struct {
@@ -22,12 +23,13 @@ type repository struct {
 	ID   int    `json:"id"`
 }
 
-func New(host, token string) (*Client, error) {
+func New(host, token string, skipWIP bool) (*Client, error) {
 	c := Client{}
 
 	c.http = http.Client{}
 	c.host = host
 	c.token = token
+	c.skipWIP = skipWIP
 
 	return &c, nil
 }
@@ -118,7 +120,13 @@ func (c *Client) getRequests(repos int) ([]Request, error) {
 			return nil, err
 		}
 
-		result = append(result, page...)
+		for _, request := range page {
+			if c.skipWIP && request.WIP {
+				continue
+			}
+
+			result = append(result, request)
+		}
 	}
 
 	return result, nil

@@ -11,6 +11,7 @@ type Request struct {
 	URLValue        string    `json:"web_url"`
 	CreatedValue    time.Time `json:"created_at"`
 	UpdatedValue    time.Time `json:"updated_at"`
+	WIP             bool      `json:"work_in_progress"`
 }
 
 func (r *Request) Repository() string {
