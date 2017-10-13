@@ -19,21 +19,19 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("%v\n", conf)
-
 	var requests []gitrequest.Request
 
 	for _, sConf := range conf.Sources {
-		var s interface {
+		var source interface {
 			GetRequests() ([]gitrequest.Request, error)
 		}
 
 		switch sConf.API {
 		case "gitlab":
-			s, err = gitlab.New(sConf.Host, sConf.Token)
+			source, err = gitlab.New(sConf.Host, sConf.Token)
 			break
 		case "github":
-			s, err = github.New(sConf.Host, sConf.User, sConf.Token)
+			source, err = github.New(sConf.Host, sConf.User, sConf.Token)
 			break
 		}
 
@@ -41,7 +39,7 @@ func main() {
 			panic(err)
 		}
 
-		sRequests, err := s.GetRequests()
+		sRequests, err := source.GetRequests()
 		if err != nil {
 			panic(err)
 		}
