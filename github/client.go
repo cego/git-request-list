@@ -55,7 +55,7 @@ func (c *Client) GetRequests() ([]gitrequest.Request, error) {
 			return nil, err
 		}
 
-		for i, _ := range requests {
+		for i := range requests {
 			requests[i].RepositoryValue = repository
 			result = append(result, &requests[i])
 		}

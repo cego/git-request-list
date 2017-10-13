@@ -20,7 +20,7 @@ func (t *Table) Add(r Request) {
 func (t *Table) String() string {
 
 	rows := append(
-		[][]string{[]string{"Repository", "Name", "State", "URL", "Created", "Updated"}},
+		[][]string{{"Repository", "Name", "State", "URL", "Created", "Updated"}},
 		t.rows...,
 	)
 
