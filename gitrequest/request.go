@@ -1,4 +1,4 @@
-package output
+package gitrequest
 
 import (
     "time"

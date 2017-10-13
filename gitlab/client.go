@@ -6,10 +6,13 @@ import (
 
     "net/http"
     "encoding/json"
+
+    "github.com/cego/git-request-list/gitrequest"
 )
 
 type Client struct {
     http http.Client
+    host string
     token string
 }
 
@@ -18,20 +21,18 @@ type repository struct {
     ID int `json:"id"`
 }
 
-func New () (*Client, error) {
+func New (host, token string) (*Client, error) {
     c := Client{}
 
     c.http = http.Client{}
+    c.host = host
+    c.token = token
 
     return &c, nil
 }
 
-func (c *Client) SetToken(t string) {
-    c.token = t
-}
-
-func (c *Client) GetRequests() ([]Request, error) {
-    var result []Request
+func (c *Client) GetRequests() ([]gitrequest.Request, error) {
+    var result []gitrequest.Request
 
     repositories, err := c.getRepositories()
     if err != nil {
@@ -44,9 +45,9 @@ func (c *Client) GetRequests() ([]Request, error) {
             return nil, err
         }
 
-        for _, request := range(requests) {
-            request.RepositoryValue = repository.Name
-            result = append(result, request)
+        for i, _ := range(requests) {
+            requests[i].RepositoryValue = repository.Name
+            result = append(result, &requests[i])
         }
     }
 
@@ -119,9 +120,9 @@ func (c *Client) getRequests(repos int) ([]Request, error) {
 }
 
 func (c *Client) get(method string, path string) (*http.Response, error) {
-    log.Printf("%s https://gitlab.cego.dk/api/v4%s", method, path)
+    log.Printf("%s %s/api/v4%s", c.host, method, path)
 
-    req, err := http.NewRequest(method, "https://gitlab.cego.dk/api/v4" + path, nil)
+    req, err := http.NewRequest(method, c.host + "/api/v4" + path, nil)
     if err != nil {
         return nil, err
     }

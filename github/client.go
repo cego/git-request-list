@@ -7,18 +7,24 @@ import (
 
     "net/http"
     "encoding/json"
+
+    "github.com/cego/git-request-list/gitrequest"
 )
 
 type Client struct {
     http http.Client
+    host string
     user string
     token string
 }
 
-func New () (*Client, error) {
+func New (host, user, token string) (*Client, error) {
     c := Client{}
 
     c.http = http.Client{}
+    c.host = host
+    c.user = user
+    c.token = token
 
     return &c, nil
 }
@@ -31,8 +37,12 @@ func (c *Client) SetToken(t string) {
     c.token = t
 }
 
-func (c *Client) GetRequests() ([]Request, error) {
-    var result []Request
+func (c *Client) SetHost(h string) {
+    c.host = h
+}
+
+func (c *Client) GetRequests() ([]gitrequest.Request, error) {
+    var result []gitrequest.Request
 
     repositories, err := c.getRepositories()
     if err != nil {
@@ -45,9 +55,9 @@ func (c *Client) GetRequests() ([]Request, error) {
             return nil, err
         }
 
-        for _, request := range(requests) {
-            request.RepositoryValue = repository
-            result = append(result, request)
+        for i, _ := range(requests) {
+            requests[i].RepositoryValue = repository
+            result = append(result, &requests[i])
         }
     }
 
@@ -102,9 +112,14 @@ func (c *Client) getRequests(repos string) ([]Request, error) {
 }
 
 func (c *Client) get(path string) (*http.Response, error) {
-    log.Printf("GET https://api.github.com%s", path)
+    host := "https://api.github.com"
+    if c.host != "" {
+        host = c.host
+    }
 
-    req, err := http.NewRequest("GET", "https://api.github.com" + path, nil)
+    log.Printf("GET %s%s", host, path)
+
+    req, err := http.NewRequest("GET", host + path, nil)
     if err != nil {
         return nil, err
     }

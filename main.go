@@ -1,56 +1,58 @@
 package main
 
 import (
-    "os"
     "fmt"
 
     "github.com/cego/git-request-list/github"
     "github.com/cego/git-request-list/gitlab"
     "github.com/cego/git-request-list/output"
+    "github.com/cego/git-request-list/gitrequest"
 )
 
+type source interface {
+    GetRequests() ([]gitrequest.Request, error)
+}
+
 func main () {
-
-    var requests []output.Request
-
-    // hub
-
-    github, err := github.New()
+    conf, err := readConfig("conf.yml")
     if err != nil {
         panic(err)
     }
 
-    github.SetUser(os.Args[1])
-    github.SetToken(os.Args[2])
-
-    githubRequests, err := github.GetRequests()
+    err = conf.check()
     if err != nil {
         panic(err)
     }
 
-    for i, _ := range(githubRequests) {
-        requests = append(requests, &githubRequests[i])
+    fmt.Printf("%v\n", conf)
+
+    var requests []gitrequest.Request
+
+    for _, sConf := range(conf.Sources) {
+        var s source
+
+        switch sConf.API {
+        case "gitlab":
+            s, err = gitlab.New(sConf.Host, sConf.Token)
+            break
+        case "github":
+            s, err = github.New(sConf.Host, sConf.User, sConf.Token)
+            break
+        }
+
+        if err != nil {
+            panic(err)
+        }
+
+        sRequests, err := s.GetRequests()
+        if err != nil {
+            panic(err)
+        }
+
+        for _, r := range(sRequests) {
+            requests = append(requests, r)
+        }
     }
-
-    // lab
-
-    gitlab, err := gitlab.New()
-    if err != nil {
-        panic(err)
-    }
-
-    gitlab.SetToken(os.Args[3])
-
-    gitlabRequests, err := gitlab.GetRequests()
-    if err != nil {
-        panic(err)
-    }
-
-    for i, _ := range(gitlabRequests) {
-        requests = append(requests, &gitlabRequests[i])
-    }
-
-    // out
 
     table := output.NewTable()
     for _, r := range(requests) {
