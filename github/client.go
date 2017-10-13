@@ -30,18 +30,6 @@ func New(host, user, token string) (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) SetUser(u string) {
-	c.user = u
-}
-
-func (c *Client) SetToken(t string) {
-	c.token = t
-}
-
-func (c *Client) SetHost(h string) {
-	c.host = h
-}
-
 func (c *Client) SetVerbose(v bool) {
 	c.verbose = v
 }
