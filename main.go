@@ -28,7 +28,7 @@ func main() {
 
 	for _, sConf := range conf.Sources {
 		var source interface {
-			GetRequests() ([]gitrequest.Request, error)
+			GetRequests(repositories []string) ([]gitrequest.Request, error)
 		}
 
 		switch sConf.API {
@@ -44,7 +44,7 @@ func main() {
 			panic(err)
 		}
 
-		sRequests, err := source.GetRequests()
+		sRequests, err := source.GetRequests(sConf.Repositories)
 		if err != nil {
 			panic(err)
 		}

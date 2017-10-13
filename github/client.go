@@ -31,7 +31,12 @@ func New(host, user, token string, verbose bool) (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) GetRequests() ([]gitrequest.Request, error) {
+func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Request, error) {
+	whitelist := map[string]bool{}
+	for _, repository := range acceptedRepositories {
+		whitelist[repository] = true
+	}
+
 	var result []gitrequest.Request
 
 	repositories, err := c.getRepositories()
@@ -40,6 +45,10 @@ func (c *Client) GetRequests() ([]gitrequest.Request, error) {
 	}
 
 	for _, repository := range repositories {
+		if len(whitelist) > 0 && !whitelist[repository] {
+			continue
+		}
+
 		requests, err := c.getRequests(repository)
 		if err != nil {
 			return nil, err
