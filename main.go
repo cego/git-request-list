@@ -11,9 +11,10 @@ import (
 
 func main() {
 	verbose := flag.Bool("v", false, "verbose")
+	configPath := flag.String("c", "/etc/git-request-list.yml", "config path")
 	flag.Parse()
 
-	conf, err := readConfig("conf.yml")
+	conf, err := readConfig(*configPath)
 	if err != nil {
 		panic(err)
 	}
