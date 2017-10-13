@@ -8,10 +8,6 @@ import (
     "github.com/cego/git-request-list/gitrequest"
 )
 
-type source interface {
-    GetRequests() ([]gitrequest.Request, error)
-}
-
 func main () {
     conf, err := readConfig("conf.yml")
     if err != nil {
@@ -28,7 +24,9 @@ func main () {
     var requests []gitrequest.Request
 
     for _, sConf := range(conf.Sources) {
-        var s source
+        var s interface {
+            GetRequests() ([]gitrequest.Request, error)
+        }
 
         switch sConf.API {
         case "gitlab":
