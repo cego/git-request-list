@@ -32,6 +32,10 @@ func readConfig(path string) (*config, error) {
 }
 
 func (c *config) check() error {
+	if len(c.Sources) == 0 {
+		return errors.New("no sources defined")
+	}
+
 	for _, s := range c.Sources {
 		switch s.API {
 		case "gitlab":
