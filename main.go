@@ -5,7 +5,6 @@ import (
 
     "github.com/cego/git-request-list/github"
     "github.com/cego/git-request-list/gitlab"
-    "github.com/cego/git-request-list/output"
     "github.com/cego/git-request-list/gitrequest"
 )
 
@@ -54,7 +53,7 @@ func main () {
         }
     }
 
-    table := output.NewTable()
+    table := gitrequest.NewTable()
     for _, r := range(requests) {
         table.Add(r)
     }

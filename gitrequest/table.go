@@ -1,10 +1,8 @@
-package output
+package gitrequest
 
 import (
     "time"
     "strings"
-
-    "github.com/cego/git-request-list/gitrequest"
 )
 
 type Table struct {
@@ -15,7 +13,7 @@ func NewTable() *Table {
     return &Table{}
 }
 
-func (t *Table) Add(r gitrequest.Request) {
+func (t *Table) Add(r Request) {
     t.rows = append(t.rows, []string{ r.Repository(), r.Name(), r.State(), r.URL(), r.Created().Format(time.UnixDate), r.Updated().Format(time.UnixDate) })
 }
 
