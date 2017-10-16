@@ -35,10 +35,6 @@ func New(host, token string, skipWIP bool, verbose bool) (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) SetVerbose(v bool) {
-	c.verbose = v
-}
-
 func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Request, error) {
 	whitelist := map[string]bool{}
 	for _, repository := range acceptedRepositories {
