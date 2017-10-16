@@ -37,10 +37,10 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Reques
 
 	var result []gitrequest.Request
 
-    user, err := c.getUser()
-    if err != nil {
-        return nil, err
-    }
+	user, err := c.getUser()
+	if err != nil {
+		return nil, err
+	}
 
 	repositories, err := c.getRepositories(user)
 	if err != nil {

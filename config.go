@@ -46,9 +46,9 @@ func (c *config) check() error {
 			return errors.New("the `api` of each source must be either `gitlab` or `github`")
 		}
 
-        if s.Token == "" {
-            return errors.New("all sources must specify a `token` for authentication")
-        }
+		if s.Token == "" {
+			return errors.New("all sources must specify a `token` for authentication")
+		}
 	}
 
 	return nil
