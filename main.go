@@ -37,7 +37,7 @@ func main() {
 			source, err = gitlab.New(sConf.Host, sConf.Token, sConf.SkipWIP, *verbose)
 			break
 		case "github":
-			source, err = github.New(sConf.Host, sConf.User, sConf.Token, *verbose)
+			source, err = github.New(sConf.Host, sConf.Token, *verbose)
 			break
 		}
 

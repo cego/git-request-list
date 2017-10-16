@@ -11,7 +11,6 @@ type config struct {
 	Sources []struct {
 		API          string   `yaml:"api"`
 		Host         string   `yaml:"host"`
-		User         string   `yaml:"user"`
 		Token        string   `yaml:"token"`
 		SkipWIP      bool     `yaml:"skip_wip"`
 		Repositories []string `yaml:"repositories"`
@@ -41,11 +40,7 @@ func (c *config) check() error {
 	for _, s := range c.Sources {
 		switch s.API {
 		case "gitlab":
-			break
 		case "github":
-			if s.User == "" {
-				return errors.New("all `github` api sources must specify a `user`")
-			}
 			break
 		default:
 			return errors.New("the `api` of each source must be either `gitlab` or `github`")

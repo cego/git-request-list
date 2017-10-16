@@ -14,17 +14,15 @@ import (
 type Client struct {
 	http    http.Client
 	host    string
-	user    string
 	token   string
 	verbose bool
 }
 
-func New(host, user, token string, verbose bool) (*Client, error) {
+func New(host, token string, verbose bool) (*Client, error) {
 	c := Client{}
 
 	c.http = http.Client{}
 	c.host = host
-	c.user = user
 	c.token = token
 	c.verbose = verbose
 
@@ -39,7 +37,12 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Reques
 
 	var result []gitrequest.Request
 
-	repositories, err := c.getRepositories()
+    user, err := c.getUser()
+    if err != nil {
+        return nil, err
+    }
+
+	repositories, err := c.getRepositories(user)
 	if err != nil {
 		return nil, err
 	}
@@ -63,12 +66,28 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Reques
 	return result, nil
 }
 
-func (c *Client) getRepositories() ([]string, error) {
-	if c.user == "" {
-		return nil, errors.New("No github user set.")
+func (c *Client) getUser() (string, error) {
+	resp, err := c.get("/user")
+	if err != nil {
+		return "", err
 	}
 
-	resp, err := c.get("/users/" + c.user + "/repos?type=all")
+	defer resp.Body.Close()
+
+	var user struct {
+		Login string `json:"login"`
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&user)
+	if err != nil {
+		return "", err
+	}
+
+	return user.Login, nil
+}
+
+func (c *Client) getRepositories(user string) ([]string, error) {
+	resp, err := c.get("/users/" + user + "/repos?type=all")
 	if err != nil {
 		return nil, err
 	}
