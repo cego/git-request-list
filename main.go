@@ -60,5 +60,6 @@ func main() {
 		table.Add(r)
 	}
 
-	fmt.Print(table.String())
+	table := gitrequest.Table{}
+	fmt.Print(table.String(requests...))
 }

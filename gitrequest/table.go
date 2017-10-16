@@ -5,26 +5,13 @@ import (
 	"time"
 )
 
-type Table struct {
-	rows [][]string
-}
+type Table struct{}
 
-func NewTable() *Table {
-	return &Table{}
-}
-
-func (t *Table) Add(r Request) {
-	t.rows = append(t.rows, []string{r.Repository(), r.Name(), r.State(), r.URL(), r.Created().Format(time.UnixDate), r.Updated().Format(time.UnixDate)})
-}
-
-func (t *Table) String() string {
-
-	rows := append(
-		[][]string{{"Repository", "Name", "State", "URL", "Created", "Updated"}},
-		t.rows...,
-	)
-
-	result := ""
+func (t *Table) String(requests ...Request) string {
+	rows := [][]string{{"Repository", "Name", "State", "URL", "Created", "Updated"}}
+	for _, r := range requests {
+		rows = append(rows, []string{r.Repository(), r.Name(), r.State(), r.URL(), r.Created().Format(time.UnixDate), r.Updated().Format(time.UnixDate)})
+	}
 
 	colWidths := map[int]int{}
 	for _, row := range rows {
@@ -36,6 +23,7 @@ func (t *Table) String() string {
 		}
 	}
 
+	result := ""
 	for _, row := range rows {
 		for i, cell := range row {
 			result = result + cell + strings.Repeat(" ", colWidths[i]-strLen(cell))
