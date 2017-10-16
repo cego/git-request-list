@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 
 	"github.com/cego/git-request-list/github"
 	"github.com/cego/git-request-list/gitlab"
@@ -16,12 +17,12 @@ func main() {
 
 	conf, err := readConfig(*configPath)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	err = conf.check()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	var requests []gitrequest.Request
@@ -41,12 +42,12 @@ func main() {
 		}
 
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		sRequests, err := source.GetRequests(sConf.Repositories)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		for _, r := range sRequests {
