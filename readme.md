@@ -14,6 +14,7 @@ For example, the configuration file below is for fetching all github pull reques
 token and merge requests from two repositories in a privately hosted Gitlab.
 
     ---
+    sort_by: updated
     sources:
       - api: github
         token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -32,3 +33,6 @@ Each source can have the following properties:
  - `host: <string>`: The protocol and hostname of the source. For `github` sources the default is `https://api.github.com`, for `gitlab` sources this is a required parameter.
  - `skip_wip: <bool>`: Ignore WIP merge requests from `gitlab` source. This is ignored for `github` sources.
  - `repositories: <list of strings>`: A list of repository names from which to include requests. If this is not given, all visible projects are searched.
+
+At top-level, you can specify the following properties:
+  - `sort_by: <string>`: The property to sort output by. Either `repository`, `name`, `state`, `url`, `created` or `updated`.

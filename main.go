@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"sort"
 
 	"github.com/cego/git-request-list/github"
 	"github.com/cego/git-request-list/gitlab"
@@ -55,9 +56,26 @@ func main() {
 		}
 	}
 
-	table := gitrequest.NewTable()
-	for _, r := range requests {
-		table.Add(r)
+	switch conf.SortBy {
+	case "name":
+		sort.Sort(gitrequest.ByName(requests))
+		break
+	case "state":
+		sort.Sort(gitrequest.ByState(requests))
+		break
+	case "url":
+		sort.Sort(gitrequest.ByURL(requests))
+		break
+	case "created":
+		sort.Sort(gitrequest.ByCreated(requests))
+		break
+	case "updated":
+		sort.Sort(gitrequest.ByUpdated(requests))
+		break
+	case "repository":
+	default:
+		sort.Sort(gitrequest.ByRepository(requests))
+		break
 	}
 
 	table := gitrequest.Table{}

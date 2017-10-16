@@ -8,6 +8,7 @@ import (
 )
 
 type config struct {
+	SortBy  string `yaml:"sort_by"`
 	Sources []struct {
 		API          string   `yaml:"api"`
 		Host         string   `yaml:"host"`
