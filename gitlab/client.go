@@ -144,7 +144,7 @@ func (c *Client) getRequests(repos int) ([]Request, error) {
 
 func (c *Client) get(method string, path string) (*http.Response, error) {
 	if c.verbose {
-		log.Printf("%s %s/api/v4%s", c.host, method, path)
+		log.Printf("%s %s/api/v4%s", method, c.host, path)
 	}
 
 	req, err := http.NewRequest(method, c.host+"/api/v4"+path, nil)
