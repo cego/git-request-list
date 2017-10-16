@@ -7,6 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// config serves as Unmarshall target of configuration files
 type config struct {
 	SortBy  string `yaml:"sort_by"`
 	Sources []struct {
@@ -18,6 +19,7 @@ type config struct {
 	} `yaml:"sources"`
 }
 
+// readConfig reads the configuration file at the given path
 func readConfig(path string) (*config, error) {
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -33,6 +35,7 @@ func readConfig(path string) (*config, error) {
 	return &c, nil
 }
 
+// check performs sanity checks on the configuration c
 func (c *config) check() error {
 	if len(c.Sources) == 0 {
 		return errors.New("no sources defined")

@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// Request is the common interface for pull- and merge-requests from github and gitlab.
 type Request interface {
 	Repository() string
 	Name() string

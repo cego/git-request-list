@@ -1,15 +1,15 @@
 package gitlab
 
 import (
-	"log"
-	"strconv"
-
 	"encoding/json"
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/cego/git-request-list/gitrequest"
 )
 
+// Client represents a Gitlab merge-request source.
 type Client struct {
 	http    http.Client
 	host    string
@@ -18,11 +18,13 @@ type Client struct {
 	skipWIP bool
 }
 
+// repository serves as Unmarshall target type when reading Gitlab API responses.
 type repository struct {
 	Name string `json:"path_with_namespace"`
 	ID   int    `json:"id"`
 }
 
+// New produces a new gitlab Client.
 func New(host, token string, skipWIP bool, verbose bool) (*Client, error) {
 	c := Client{}
 
@@ -35,6 +37,8 @@ func New(host, token string, skipWIP bool, verbose bool) (*Client, error) {
 	return &c, nil
 }
 
+// GetRequests returns a slice of merge-requests visible to the Client c. If acceptedRepositories is not empty, only
+// merge-requests from the repositories whose name is included in acceptedRepositories are returned.
 func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Request, error) {
 	whitelist := map[string]bool{}
 	for _, repository := range acceptedRepositories {
@@ -67,6 +71,7 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Reques
 	return result, nil
 }
 
+// getRepositories gets the repositories visible to c.
 func (c *Client) getRepositories() ([]repository, error) {
 	var result []repository
 
@@ -99,6 +104,7 @@ func (c *Client) getRepositories() ([]repository, error) {
 	return result, nil
 }
 
+// getRequests returns all merge-requests of the repository with the given ID visible to c.
 func (c *Client) getRequests(repos int) ([]Request, error) {
 	var result []Request
 
@@ -138,6 +144,7 @@ func (c *Client) getRequests(repos int) ([]Request, error) {
 	return result, nil
 }
 
+// get completes a HTTP request to the Gitlab API represented by c.
 func (c *Client) get(method string, path string) (*http.Response, error) {
 	if c.verbose {
 		log.Printf("%s %s/api/v4%s", method, c.host, path)

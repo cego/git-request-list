@@ -5,8 +5,10 @@ import (
 	"time"
 )
 
+// Table represents an ASCII table containing pull- and merge-requests.
 type Table struct{}
 
+// String returns the ASCII table t containing the given requests.
 func (t *Table) String(requests ...Request) string {
 	rows := [][]string{{"Repository", "Name", "State", "URL", "Created", "Updated"}}
 	for _, r := range requests {
@@ -39,6 +41,7 @@ func (t *Table) String(requests ...Request) string {
 	return result
 }
 
+// strLen returns the rune-length of s.
 func strLen(s string) int {
 	return len([]rune(s))
 }

@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+	// Read flags and configuration file
+
 	verbose := flag.Bool("v", false, "verbose")
 	configPath := flag.String("c", "/etc/git-request-list.yml", "config path")
 	flag.Parse()
@@ -26,8 +28,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var requests []gitrequest.Request
+	// Gather requests from configured sources
 
+	var requests []gitrequest.Request
 	for _, sConf := range conf.Sources {
 		var source interface {
 			GetRequests(repositories []string) ([]gitrequest.Request, error)
@@ -55,6 +58,8 @@ func main() {
 			requests = append(requests, r)
 		}
 	}
+
+	// Output the requests
 
 	switch conf.SortBy {
 	case "name":

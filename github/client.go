@@ -1,16 +1,16 @@
 package github
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
-	"strconv"
-
-	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/cego/git-request-list/gitrequest"
 )
 
+// Client represents a Github pull-request source.
 type Client struct {
 	http    http.Client
 	host    string
@@ -18,6 +18,7 @@ type Client struct {
 	verbose bool
 }
 
+// New produces a new github Client.
 func New(host, token string, verbose bool) (*Client, error) {
 	c := Client{}
 
@@ -29,6 +30,8 @@ func New(host, token string, verbose bool) (*Client, error) {
 	return &c, nil
 }
 
+// GetRequests returns a slice of pull-requests visible to the Client c. If acceptedRepositories is not empty, only
+// pull-requests from the repositories whose name is included in acceptedRepositories are returned.
 func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Request, error) {
 	whitelist := map[string]bool{}
 	for _, repository := range acceptedRepositories {
@@ -66,6 +69,7 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Reques
 	return result, nil
 }
 
+// getUser gets the login name associated with the token of c.
 func (c *Client) getUser() (string, error) {
 	resp, err := c.get("/user")
 	if err != nil {
@@ -86,6 +90,7 @@ func (c *Client) getUser() (string, error) {
 	return user.Login, nil
 }
 
+// getRepositories gets the full names of repositories for the given user visible to c.
 func (c *Client) getRepositories(user string) ([]string, error) {
 	resp, err := c.get("/users/" + user + "/repos?type=all")
 	if err != nil {
@@ -111,6 +116,7 @@ func (c *Client) getRepositories(user string) ([]string, error) {
 	return names, nil
 }
 
+// getRequests returns all pull-requests of the repository with the given name visible to c.
 func (c *Client) getRequests(repos string) ([]Request, error) {
 	resp, err := c.get("/repos/" + repos + "/pulls")
 	if err != nil {
@@ -129,6 +135,7 @@ func (c *Client) getRequests(repos string) ([]Request, error) {
 	return requests, nil
 }
 
+// get completes a HTTP request to the Github API represented by c.
 func (c *Client) get(path string) (*http.Response, error) {
 	host := "https://api.github.com"
 	if c.host != "" {

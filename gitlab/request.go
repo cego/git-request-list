@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+// Request implements github.com/cego/git-request-list/gitrequest.Request and serves as Unmarshal target type when
+// reading Gitlab API responses.
 type Request struct {
 	RepositoryValue string
 	NameValue       string    `json:"title"`
