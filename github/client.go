@@ -38,18 +38,12 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Reques
 		whitelist[repository] = true
 	}
 
+	repositories, err := c.getRepositories()
+	if err != nil {
+		return nil, err
+	}
+
 	var result []gitrequest.Request
-
-	user, err := c.getUser()
-	if err != nil {
-		return nil, err
-	}
-
-	repositories, err := c.getRepositories(user)
-	if err != nil {
-		return nil, err
-	}
-
 	for _, repository := range repositories {
 		if len(whitelist) > 0 && !whitelist[repository] {
 			continue
@@ -69,30 +63,9 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Reques
 	return result, nil
 }
 
-// getUser gets the login name associated with the token of c.
-func (c *Client) getUser() (string, error) {
-	resp, err := c.get("/user")
-	if err != nil {
-		return "", err
-	}
-
-	defer resp.Body.Close()
-
-	var user struct {
-		Login string `json:"login"`
-	}
-
-	err = json.NewDecoder(resp.Body).Decode(&user)
-	if err != nil {
-		return "", err
-	}
-
-	return user.Login, nil
-}
-
-// getRepositories gets the full names of repositories for the given user visible to c.
-func (c *Client) getRepositories(user string) ([]string, error) {
-	resp, err := c.get("/users/" + user + "/repos?type=all")
+// getRepositories gets the full names of repositories visible to c.
+func (c *Client) getRepositories() ([]string, error) {
+	resp, err := c.get("/user/repos")
 	if err != nil {
 		return nil, err
 	}
