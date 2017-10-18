@@ -5,6 +5,8 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/url"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -26,6 +28,11 @@ type pullRequest struct {
 	URL     string    `json:"url"`
 	Created time.Time `json:"created_at"`
 	Updated time.Time `json:"updated_at"`
+}
+
+// links represents the Link header used for pagination in the Github API
+type links struct {
+	Next string
 }
 
 func init() {
@@ -78,55 +85,76 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]providers.Request
 
 // getRepositories gets the full names of repositories visible to c.
 func (c *Client) getRepositories() ([]string, error) {
-	resp, err := c.get("/user/repos")
-	if err != nil {
-		return nil, err
+	var result []string
+
+	for next := "/user/repos"; next != ""; {
+		resp, err := c.get(next)
+		if err != nil {
+			return nil, err
+		}
+
+		defer resp.Body.Close()
+
+		var page []struct {
+			Name string `json:"full_name"`
+		}
+
+		err = json.NewDecoder(resp.Body).Decode(&page)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, r := range page {
+			result = append(result, r.Name)
+		}
+
+		links, err := readPaginationLinks(resp.Header)
+		if err != nil {
+			return nil, err
+		}
+
+		next = links.Next
 	}
 
-	defer resp.Body.Close()
-
-	var repos []struct {
-		Name string `json:"full_name"`
-	}
-
-	err = json.NewDecoder(resp.Body).Decode(&repos)
-	if err != nil {
-		return nil, err
-	}
-
-	var names []string
-	for _, r := range repos {
-		names = append(names, r.Name)
-	}
-
-	return names, nil
+	return result, nil
 }
 
 // getRequests returns all pull-requests of the repository with the given name visible to c.
 func (c *Client) getRequests(repos string) ([]providers.Request, error) {
-	resp, err := c.get("/repos/" + repos + "/pulls")
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	var requests []pullRequest
-	err = json.NewDecoder(resp.Body).Decode(&requests)
-	if err != nil {
-		return nil, err
-	}
-
 	var result []providers.Request
-	for _, r := range requests {
-		result = append(result, providers.Request{
-			Repository: repos,
-			Name:       r.Name,
-			State:      r.State,
-			URL:        r.URL,
-			Created:    r.Created,
-			Updated:    r.Updated,
-		})
+
+	for next := "/repos/" + repos + "/pulls"; next != ""; {
+		resp, err := c.get(next)
+		if err != nil {
+			return nil, err
+		}
+
+		defer resp.Body.Close()
+
+		var page []pullRequest
+
+		err = json.NewDecoder(resp.Body).Decode(&page)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, r := range page {
+			result = append(result, providers.Request{
+				Repository: repos,
+				Name:       r.Name,
+				State:      r.State,
+				URL:        r.URL,
+				Created:    r.Created,
+				Updated:    r.Updated,
+			})
+		}
+
+		links, err := readPaginationLinks(resp.Header)
+		if err != nil {
+			return nil, err
+		}
+
+		next = links.Next
 	}
 
 	return result, nil
@@ -134,16 +162,36 @@ func (c *Client) getRequests(repos string) ([]providers.Request, error) {
 
 // get completes a HTTP request to the Github API represented by c.
 func (c *Client) get(path string) (*http.Response, error) {
-	host := "https://api.github.com"
-	if c.host != "" {
-		host = c.host
+
+	// Construct an url
+
+	u, err := url.Parse(path)
+	if err != nil {
+		return nil, err
 	}
+
+	if !u.IsAbs() {
+		if c.host != "" {
+			h, err := url.Parse(c.host)
+			if err != nil {
+				return nil, err
+			}
+
+			u.Scheme = h.Scheme
+			u.Host = h.Host
+		} else {
+			u.Scheme = "https"
+			u.Host = "api.github.com"
+		}
+	}
+
+	// Build a HTTP request
 
 	if c.verbose {
-		log.Printf("GET %s%s", host, path)
+		log.Printf("GET %s", u.String())
 	}
 
-	req, err := http.NewRequest("GET", host+path, nil)
+	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -151,6 +199,8 @@ func (c *Client) get(path string) (*http.Response, error) {
 	if c.token != "" {
 		req.Header.Set("Authorization", "token "+c.token)
 	}
+
+	// Get the response, failing if we hit the Gitlab API rate limit
 
 	resp, err := c.http.Do(req)
 	if err != nil {
@@ -166,4 +216,22 @@ func (c *Client) get(path string) (*http.Response, error) {
 	}
 
 	return resp, nil
+}
+
+// readPaginationLinks extracts links from headers of Gitlab API responses
+// See https://developer.github.com/v3/#pagination
+func readPaginationLinks(header http.Header) (links, error) {
+	raw := header.Get("Link")
+	if raw == "" {
+		return links{}, nil
+	}
+
+	re := regexp.MustCompile("<([^>]+)>; rel=\"next\"")
+	match := re.FindStringSubmatch(raw)
+
+	if match == nil {
+		return links{}, nil
+	}
+
+	return links{Next: match[1]}, nil
 }
