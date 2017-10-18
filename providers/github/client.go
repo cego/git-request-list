@@ -20,8 +20,11 @@ type Client struct {
 
 func init() {
 	factory := func(host, token string, verbose bool) (providers.Provider, error) {
-		c := Client{}
+		if token == "" {
+			return nil, errors.New("a github access token is required")
+		}
 
+		c := Client{}
 		c.http = http.Client{}
 		c.host = host
 		c.token = token

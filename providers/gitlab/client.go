@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -25,8 +26,11 @@ type repository struct {
 
 func init() {
 	factory := func(host, token string, verbose bool) (providers.Provider, error) {
-		c := Client{}
+		if token == "" {
+			return nil, errors.New("a gitlab access token is required")
+		}
 
+		c := Client{}
 		c.http = http.Client{}
 		c.host = host
 		c.token = token

@@ -25,11 +25,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = conf.check()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	// Gather requests from configured sources
 
 	var requests []providers.Request

@@ -9,7 +9,7 @@ Configuration
 `git-request-list` accepts two flags: `-v` enables verbose logging and `-c <path>` overrides the path to the configuration
 file to use. All other behaviour is controlled by the configuration file.
 
-The configuration file is written in YAML and must contain a list of sources from which to fetch pull- or merge-requests.
+The configuration file is written in YAML and should contain a list of sources from which to fetch pull- or merge-requests.
 For example, the configuration file below is for fetching all github pull requests for the identified by a given access
 token and merge requests from two repositories in a privately hosted Gitlab.
 
