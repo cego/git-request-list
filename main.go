@@ -39,9 +39,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		for _, r := range sRequests {
-			requests = append(requests, r)
-		}
+		requests = append(requests, sRequests...)
 	}
 
 	// Output the requests
