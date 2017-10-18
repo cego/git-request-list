@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/cego/git-request-list/providers"
 )
@@ -18,10 +19,20 @@ type Client struct {
 	verbose bool
 }
 
-// repository serves as Unmarshall target type when reading Gitlab API responses.
+// repository serves as Unmarshall target type when reading Gitlab API responses
 type repository struct {
 	Name string `json:"path_with_namespace"`
 	ID   int    `json:"id"`
+}
+
+// mergeRequest serves as Unmarshal target type when reading Gitlab API responses
+type mergeRequest struct {
+	Name    string    `json:"title"`
+	State   string    `json:"state"`
+	URL     string    `json:"web_url"`
+	Created time.Time `json:"created_at"`
+	Updated time.Time `json:"updated_at"`
+	WIP     bool      `json:"work_in_progress"`
 }
 
 func init() {
@@ -62,15 +73,12 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]providers.Request
 			continue
 		}
 
-		requests, err := c.getRequests(repository.ID)
+		requests, err := c.getRequests(repository)
 		if err != nil {
 			return nil, err
 		}
 
-		for i := range requests {
-			requests[i].RepositoryValue = repository.Name
-			result = append(result, &requests[i])
-		}
+		result = append(result, requests...)
 	}
 
 	return result, nil
@@ -109,11 +117,10 @@ func (c *Client) getRepositories() ([]repository, error) {
 	return result, nil
 }
 
-// getRequests returns all merge-requests of the repository with the given ID visible to c.
-func (c *Client) getRequests(repos int) ([]Request, error) {
-	var result []Request
+// getRequests returns all open merge-requests of the repository with the given ID visible to c.
+func (c *Client) getRequests(repos repository) ([]providers.Request, error) {
 
-	resp, err := c.get("HEAD", "/projects/"+strconv.Itoa(repos)+"/merge_requests?state=opened")
+	resp, err := c.get("HEAD", "/projects/"+strconv.Itoa(repos.ID)+"/merge_requests?state=opened")
 	if err != nil {
 		return nil, err
 	}
@@ -122,27 +129,34 @@ func (c *Client) getRequests(repos int) ([]Request, error) {
 		return nil, err
 	}
 
+	var result []providers.Request
 	for p := 1; p <= pageCount; p++ {
-		resp, err := c.get("GET", "/projects/"+strconv.Itoa(repos)+"/merge_requests?state=opened&page="+strconv.Itoa(p))
+		resp, err := c.get("GET", "/projects/"+strconv.Itoa(repos.ID)+"/merge_requests?state=opened&page="+strconv.Itoa(p))
 		if err != nil {
 			return nil, err
 		}
 
 		defer resp.Body.Close()
 
-		var page []Request
-
+		var page []mergeRequest
 		err = json.NewDecoder(resp.Body).Decode(&page)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, request := range page {
-			if request.WIP {
+		for _, r := range page {
+			if r.WIP {
 				continue
 			}
 
-			result = append(result, request)
+			result = append(result, providers.Request{
+				Repository: repos.Name,
+				Name:       r.Name,
+				State:      r.State,
+				URL:        r.URL,
+				Created:    r.Created,
+				Updated:    r.Updated,
+			})
 		}
 	}
 

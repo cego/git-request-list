@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/cego/git-request-list/providers"
 )
@@ -16,6 +17,15 @@ type Client struct {
 	host    string
 	token   string
 	verbose bool
+}
+
+// pullRequest serves as Unmarshal target type when reading Github API responses
+type pullRequest struct {
+	Name    string    `json:"title"`
+	State   string    `json:"state"`
+	URL     string    `json:"url"`
+	Created time.Time `json:"created_at"`
+	Updated time.Time `json:"updated_at"`
 }
 
 func init() {
@@ -60,10 +70,7 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]providers.Request
 			return nil, err
 		}
 
-		for i := range requests {
-			requests[i].RepositoryValue = repository
-			result = append(result, &requests[i])
-		}
+		result = append(result, requests...)
 	}
 
 	return result, nil
@@ -96,7 +103,7 @@ func (c *Client) getRepositories() ([]string, error) {
 }
 
 // getRequests returns all pull-requests of the repository with the given name visible to c.
-func (c *Client) getRequests(repos string) ([]Request, error) {
+func (c *Client) getRequests(repos string) ([]providers.Request, error) {
 	resp, err := c.get("/repos/" + repos + "/pulls")
 	if err != nil {
 		return nil, err
@@ -104,14 +111,25 @@ func (c *Client) getRequests(repos string) ([]Request, error) {
 
 	defer resp.Body.Close()
 
-	var requests []Request
-
+	var requests []pullRequest
 	err = json.NewDecoder(resp.Body).Decode(&requests)
 	if err != nil {
 		return nil, err
 	}
 
-	return requests, nil
+	var result []providers.Request
+	for _, r := range requests {
+		result = append(result, providers.Request{
+			Repository: repos,
+			Name:       r.Name,
+			State:      r.State,
+			URL:        r.URL,
+			Created:    r.Created,
+			Updated:    r.Updated,
+		})
+	}
+
+	return result, nil
 }
 
 // get completes a HTTP request to the Github API represented by c.

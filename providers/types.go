@@ -4,14 +4,14 @@ import (
 	"time"
 )
 
-// Request is the common interface for pull- and merge-requests
-type Request interface {
-	Repository() string
-	Name() string
-	State() string
-	URL() string
-	Created() time.Time
-	Updated() time.Time
+// Request represents a pull- or merge-request
+type Request struct {
+	Repository string
+	Name       string
+	State      string
+	URL        string
+	Created    time.Time
+	Updated    time.Time
 }
 
 // Provider is the common interface for all providers of pull- and merge-requests
