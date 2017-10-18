@@ -3,6 +3,7 @@ package formatters
 import (
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/cego/git-request-list/providers"
 )
@@ -21,8 +22,8 @@ func (t *Table) String(requests ...providers.Request) string {
 	for _, row := range rows {
 		for i, cell := range row {
 			w, exists := colWidths[i]
-			if !exists || strLen(cell) > w {
-				colWidths[i] = strLen(cell)
+			if !exists || utf8.RuneCountInString(cell) > w {
+				colWidths[i] = utf8.RuneCountInString(cell)
 			}
 		}
 	}
@@ -30,7 +31,7 @@ func (t *Table) String(requests ...providers.Request) string {
 	result := ""
 	for _, row := range rows {
 		for i, cell := range row {
-			result = result + cell + strings.Repeat(" ", colWidths[i]-strLen(cell))
+			result = result + cell + strings.Repeat(" ", colWidths[i]-utf8.RuneCountInString(cell))
 
 			if i < len(row)-1 {
 				result = result + " "
@@ -41,9 +42,4 @@ func (t *Table) String(requests ...providers.Request) string {
 	}
 
 	return result
-}
-
-// strLen returns the rune-length of s.
-func strLen(s string) int {
-	return len([]rune(s))
 }
