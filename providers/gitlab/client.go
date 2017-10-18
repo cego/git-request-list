@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cego/git-request-list/gitrequest"
+	"github.com/cego/git-request-list/providers"
 )
 
 // Client represents a Gitlab merge-request source.
@@ -39,13 +39,13 @@ func New(host, token string, skipWIP bool, verbose bool) (*Client, error) {
 
 // GetRequests returns a slice of merge-requests visible to the Client c. If acceptedRepositories is not empty, only
 // merge-requests from the repositories whose name is included in acceptedRepositories are returned.
-func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Request, error) {
+func (c *Client) GetRequests(acceptedRepositories []string) ([]providers.Request, error) {
 	whitelist := map[string]bool{}
 	for _, repository := range acceptedRepositories {
 		whitelist[repository] = true
 	}
 
-	var result []gitrequest.Request
+	var result []providers.Request
 
 	repositories, err := c.getRepositories()
 	if err != nil {

@@ -6,9 +6,10 @@ import (
 	"log"
 	"sort"
 
-	"github.com/cego/git-request-list/github"
-	"github.com/cego/git-request-list/gitlab"
-	"github.com/cego/git-request-list/gitrequest"
+	"github.com/cego/git-request-list/providers/github"
+	"github.com/cego/git-request-list/providers/gitlab"
+	"github.com/cego/git-request-list/providers"
+	"github.com/cego/git-request-list/formatters"
 )
 
 func main() {
@@ -30,10 +31,10 @@ func main() {
 
 	// Gather requests from configured sources
 
-	var requests []gitrequest.Request
+	var requests []providers.Request
 	for _, sConf := range conf.Sources {
 		var source interface {
-			GetRequests(repositories []string) ([]gitrequest.Request, error)
+			GetRequests(repositories []string) ([]providers.Request, error)
 		}
 
 		switch sConf.API {
@@ -63,26 +64,26 @@ func main() {
 
 	switch conf.SortBy {
 	case "name":
-		sort.Sort(gitrequest.ByName(requests))
+		sort.Sort(formatters.ByName(requests))
 		break
 	case "state":
-		sort.Sort(gitrequest.ByState(requests))
+		sort.Sort(formatters.ByState(requests))
 		break
 	case "url":
-		sort.Sort(gitrequest.ByURL(requests))
+		sort.Sort(formatters.ByURL(requests))
 		break
 	case "created":
-		sort.Sort(gitrequest.ByCreated(requests))
+		sort.Sort(formatters.ByCreated(requests))
 		break
 	case "updated":
-		sort.Sort(gitrequest.ByUpdated(requests))
+		sort.Sort(formatters.ByUpdated(requests))
 		break
 	case "repository":
 	default:
-		sort.Sort(gitrequest.ByRepository(requests))
+		sort.Sort(formatters.ByRepository(requests))
 		break
 	}
 
-	table := gitrequest.Table{}
+	table := formatters.Table{}
 	fmt.Print(table.String(requests...))
 }

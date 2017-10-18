@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cego/git-request-list/gitrequest"
+	"github.com/cego/git-request-list/providers"
 )
 
 // Client represents a Github pull-request source.
@@ -32,7 +32,7 @@ func New(host, token string, verbose bool) (*Client, error) {
 
 // GetRequests returns a slice of pull-requests visible to the Client c. If acceptedRepositories is not empty, only
 // pull-requests from the repositories whose name is included in acceptedRepositories are returned.
-func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Request, error) {
+func (c *Client) GetRequests(acceptedRepositories []string) ([]providers.Request, error) {
 	whitelist := map[string]bool{}
 	for _, repository := range acceptedRepositories {
 		whitelist[repository] = true
@@ -43,7 +43,7 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]gitrequest.Reques
 		return nil, err
 	}
 
-	var result []gitrequest.Request
+	var result []providers.Request
 	for _, repository := range repositories {
 		if len(whitelist) > 0 && !whitelist[repository] {
 			continue
