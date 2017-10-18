@@ -31,7 +31,6 @@ Each source can have the following properties:
  - `api: <string>`: Either `github` or `gitlab`. Required for each source.
  - `token: <string>`: A personal API access token. Required for each source.
  - `host: <string>`: The protocol and hostname of the source. For `github` sources the default is `https://api.github.com`, for `gitlab` sources this is a required parameter.
- - `skip_wip: <bool>`: Ignore WIP merge requests from `gitlab` source. This is ignored for `github` sources.
  - `repositories: <list of strings>`: A list of repository names from which to include requests. If this is not given, all visible projects are searched.
 
 At top-level, you can specify the following properties:

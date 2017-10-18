@@ -39,7 +39,7 @@ func main() {
 
 		switch sConf.API {
 		case "gitlab":
-			source, err = gitlab.New(sConf.Host, sConf.Token, sConf.SkipWIP, *verbose)
+			source, err = gitlab.New(sConf.Host, sConf.Token, *verbose)
 			break
 		case "github":
 			source, err = github.New(sConf.Host, sConf.Token, *verbose)

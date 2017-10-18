@@ -14,7 +14,6 @@ type config struct {
 		API          string   `yaml:"api"`
 		Host         string   `yaml:"host"`
 		Token        string   `yaml:"token"`
-		SkipWIP      bool     `yaml:"skip_wip"`
 		Repositories []string `yaml:"repositories"`
 	} `yaml:"sources"`
 }

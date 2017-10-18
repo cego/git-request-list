@@ -15,7 +15,6 @@ type Client struct {
 	host    string
 	token   string
 	verbose bool
-	skipWIP bool
 }
 
 // repository serves as Unmarshall target type when reading Gitlab API responses.
@@ -25,14 +24,13 @@ type repository struct {
 }
 
 // New produces a new gitlab Client.
-func New(host, token string, skipWIP bool, verbose bool) (*Client, error) {
+func New(host, token string, verbose bool) (*Client, error) {
 	c := Client{}
 
 	c.http = http.Client{}
 	c.host = host
 	c.token = token
 	c.verbose = verbose
-	c.skipWIP = skipWIP
 
 	return &c, nil
 }
@@ -133,7 +131,7 @@ func (c *Client) getRequests(repos int) ([]Request, error) {
 		}
 
 		for _, request := range page {
-			if c.skipWIP && request.WIP {
+			if request.WIP {
 				continue
 			}
 
