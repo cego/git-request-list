@@ -18,16 +18,19 @@ type Client struct {
 	verbose bool
 }
 
-// New produces a new github Client.
-func New(host, token string, verbose bool) (*Client, error) {
-	c := Client{}
+func init() {
+	factory := func(host, token string, verbose bool) (providers.Provider, error) {
+		c := Client{}
 
-	c.http = http.Client{}
-	c.host = host
-	c.token = token
-	c.verbose = verbose
+		c.http = http.Client{}
+		c.host = host
+		c.token = token
+		c.verbose = verbose
 
-	return &c, nil
+		return &c, nil
+	}
+
+	providers.RegisterProvider("github", factory)
 }
 
 // GetRequests returns a slice of pull-requests visible to the Client c. If acceptedRepositories is not empty, only

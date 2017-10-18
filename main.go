@@ -6,10 +6,11 @@ import (
 	"log"
 	"sort"
 
-	"github.com/cego/git-request-list/providers/github"
-	"github.com/cego/git-request-list/providers/gitlab"
-	"github.com/cego/git-request-list/providers"
 	"github.com/cego/git-request-list/formatters"
+	"github.com/cego/git-request-list/providers"
+
+	_ "github.com/cego/git-request-list/providers/github"
+	_ "github.com/cego/git-request-list/providers/gitlab"
 )
 
 func main() {
@@ -33,19 +34,7 @@ func main() {
 
 	var requests []providers.Request
 	for _, sConf := range conf.Sources {
-		var source interface {
-			GetRequests(repositories []string) ([]providers.Request, error)
-		}
-
-		switch sConf.API {
-		case "gitlab":
-			source, err = gitlab.New(sConf.Host, sConf.Token, *verbose)
-			break
-		case "github":
-			source, err = github.New(sConf.Host, sConf.Token, *verbose)
-			break
-		}
-
+		source, err := providers.GetProvider(sConf.API, sConf.Host, sConf.Token, *verbose)
 		if err != nil {
 			log.Fatal(err)
 		}
