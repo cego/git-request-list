@@ -53,25 +53,16 @@ func init() {
 	providers.RegisterProvider("github", factory)
 }
 
-// GetRequests returns a slice of pull-requests visible to the Client c. If acceptedRepositories is not empty, only
-// pull-requests from the repositories whose name is included in acceptedRepositories are returned.
-func (c *Client) GetRequests(acceptedRepositories []string) ([]providers.Request, error) {
-	whitelist := map[string]bool{}
-	for _, repository := range acceptedRepositories {
-		whitelist[repository] = true
-	}
-
-	repositories, err := c.getRepositories()
+// GetRequests returns a slice of pull-requests visible to the Client c. Only pull-requests from the repositories whose
+// name is matched by repositoryFilter are returned.
+func (c *Client) GetRequests(repositoryFilter regexp.Regexp) ([]providers.Request, error) {
+	repositories, err := c.getRepositories(repositoryFilter)
 	if err != nil {
 		return nil, err
 	}
 
 	var result []providers.Request
 	for _, repository := range repositories {
-		if len(whitelist) > 0 && !whitelist[repository] {
-			continue
-		}
-
 		requests, err := c.getRequests(repository)
 		if err != nil {
 			return nil, err
@@ -83,8 +74,8 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]providers.Request
 	return result, nil
 }
 
-// getRepositories gets the full names of repositories visible to c.
-func (c *Client) getRepositories() ([]string, error) {
+// getRepositories gets the full names of repositories visible to c. Only repository names matching filter are returned.
+func (c *Client) getRepositories(filter regexp.Regexp) ([]string, error) {
 	var result []string
 
 	for next := "/user/repos"; next != ""; {
@@ -105,6 +96,9 @@ func (c *Client) getRepositories() ([]string, error) {
 		}
 
 		for _, r := range page {
+			if !filter.MatchString(r.Name) {
+				continue
+			}
 			result = append(result, r.Name)
 		}
 
