@@ -29,7 +29,6 @@ type repository struct {
 // mergeRequest serves as Unmarshal target type when reading Gitlab API responses
 type mergeRequest struct {
 	Name    string    `json:"title"`
-	State   string    `json:"state"`
 	URL     string    `json:"web_url"`
 	Created time.Time `json:"created_at"`
 	Updated time.Time `json:"updated_at"`
@@ -149,7 +148,6 @@ func (c *Client) getRequests(repos repository) ([]providers.Request, error) {
 			result = append(result, providers.Request{
 				Repository: repos.Name,
 				Name:       r.Name,
-				State:      r.State,
 				URL:        r.URL,
 				Created:    r.Created,
 				Updated:    r.Updated,

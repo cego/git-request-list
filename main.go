@@ -48,9 +48,6 @@ func main() {
 	case "name":
 		sort.Sort(formatters.ByName(requests))
 		break
-	case "state":
-		sort.Sort(formatters.ByState(requests))
-		break
 	case "url":
 		sort.Sort(formatters.ByURL(requests))
 		break
