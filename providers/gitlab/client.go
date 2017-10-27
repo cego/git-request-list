@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -53,26 +54,17 @@ func init() {
 	providers.RegisterProvider("gitlab", factory)
 }
 
-// GetRequests returns a slice of merge-requests visible to the Client c. If acceptedRepositories is not empty, only
-// merge-requests from the repositories whose name is included in acceptedRepositories are returned.
-func (c *Client) GetRequests(acceptedRepositories []string) ([]providers.Request, error) {
-	whitelist := map[string]bool{}
-	for _, repository := range acceptedRepositories {
-		whitelist[repository] = true
-	}
-
+// GetRequests returns a slice of merge-requests visible to the Client c. Only merge-requests from the repositories
+// whose name matches repositoryFilter are returned.
+func (c *Client) GetRequests(repositoryFilter regexp.Regexp) ([]providers.Request, error) {
 	var result []providers.Request
 
-	repositories, err := c.getRepositories()
+	repositories, err := c.getRepositories(repositoryFilter)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, repository := range repositories {
-		if len(whitelist) > 0 && !whitelist[repository.Name] {
-			continue
-		}
-
 		requests, err := c.getRequests(repository)
 		if err != nil {
 			return nil, err
@@ -84,8 +76,8 @@ func (c *Client) GetRequests(acceptedRepositories []string) ([]providers.Request
 	return result, nil
 }
 
-// getRepositories gets the repositories visible to c.
-func (c *Client) getRepositories() ([]repository, error) {
+// getRepositories gets the repositories visible to c. Only repositories whose name matches filter are returned.
+func (c *Client) getRepositories(filter regexp.Regexp) ([]repository, error) {
 	var result []repository
 
 	resp, err := c.get("HEAD", "/projects")
@@ -111,7 +103,12 @@ func (c *Client) getRepositories() ([]repository, error) {
 			return nil, err
 		}
 
-		result = append(result, page...)
+		for _, r := range page {
+			if !filter.MatchString(r.Name) {
+				continue
+			}
+			result = append(result, r)
+		}
 	}
 
 	return result, nil

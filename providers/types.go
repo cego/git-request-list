@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"regexp"
 	"time"
 )
 
@@ -16,7 +17,7 @@ type Request struct {
 
 // Provider is the common interface for all providers of pull- and merge-requests
 type Provider interface {
-	GetRequests(repositories []string) ([]Request, error)
+	GetRequests(repositoryFilter regexp.Regexp) ([]Request, error)
 }
 
 // ProviderFactory types a function for producing new Providers
