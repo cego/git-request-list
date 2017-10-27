@@ -18,13 +18,6 @@ func (rs ByName) Len() int           { return len(rs) }
 func (rs ByName) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
 func (rs ByName) Less(i, j int) bool { return rs[i].Name < rs[j].Name }
 
-// ByState implements sort.Interface for []providers.Request based on State.
-type ByState []providers.Request
-
-func (rs ByState) Len() int           { return len(rs) }
-func (rs ByState) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
-func (rs ByState) Less(i, j int) bool { return rs[i].State < rs[j].State }
-
 // ByURL implements sort.Interface for []providers.Request based on URL.
 type ByURL []providers.Request
 

@@ -8,7 +8,6 @@ import (
 type Request struct {
 	Repository string
 	Name       string
-	State      string
 	URL        string
 	Created    time.Time
 	Updated    time.Time

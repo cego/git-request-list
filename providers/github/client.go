@@ -24,7 +24,6 @@ type Client struct {
 // pullRequest serves as Unmarshal target type when reading Github API responses
 type pullRequest struct {
 	Name    string    `json:"title"`
-	State   string    `json:"state"`
 	URL     string    `json:"url"`
 	Created time.Time `json:"created_at"`
 	Updated time.Time `json:"updated_at"`
@@ -142,7 +141,6 @@ func (c *Client) getRequests(repos string) ([]providers.Request, error) {
 			result = append(result, providers.Request{
 				Repository: repos,
 				Name:       r.Name,
-				State:      r.State,
 				URL:        r.URL,
 				Created:    r.Created,
 				Updated:    r.Updated,
