@@ -15,23 +15,25 @@ type Table struct {
 
 const htmlTemplate = `
 <html>
-  <head></head>
+  <head>
+    <link href="style.css" rel="stylesheet">
+  </head>
   <body>
     <table>
       <tr>
-        <th>Repository</th>
-        <th>Name</th>
-        <th>URL</th>
-        <th>Created</th>
-        <th>Updated</th>
+        <th class="header-repository">Repository</th>
+        <th class="header-name">Name</th>
+        <th class="header-url">URL</th>
+        <th class="header-created">Created</th>
+        <th class="header-updated">Updated</th>
       </tr>
       {{range .Requests}}
       <tr>
-        <td>{{.Repository}}</td>
-        <td>{{.Name}}</td>
-        <td>{{.URL}}</td>
-        <td>{{.Created}}</td>
-        <td>{{.Updated}}</td>
+        <td class="item-repository">{{.Repository}}</td>
+        <td class="item-name">{{.Name}}</td>
+        <td class="item-url">{{.URL}}</td>
+        <td class="item-created">{{.Created}}</td>
+        <td class="item-updated">{{.Updated}}</td>
       </tr>
       {{end}}
     </table>
