@@ -1,20 +1,34 @@
-package formatters
+package text
 
 import (
 	"strings"
 	"time"
 	"unicode/utf8"
 
-	"github.com/cego/git-request-list/providers"
+	"github.com/cego/git-request-list/formatters"
+	"github.com/cego/git-request-list/request"
 )
 
 // Table represents an ASCII table containing pull- and merge-requests.
-type Table struct{}
+type Table struct {
+	requests []request.Request
+}
 
-// String returns the ASCII table t containing the given requests.
-func (t *Table) String(requests ...providers.Request) string {
+func init() {
+	factory := func(requests []request.Request) (formatters.Formatter, error) {
+		t := Table{}
+		t.requests = requests
+
+		return &t, nil
+	}
+
+	formatters.RegisterFormatter("text", factory)
+}
+
+// String returns the ASCII string that t represents.
+func (t *Table) String() string {
 	rows := [][]string{{"Repository", "Name", "URL", "Created", "Updated"}}
-	for _, r := range requests {
+	for _, r := range t.requests {
 		rows = append(rows, []string{r.Repository, r.Name, r.URL, r.Created.Format(time.UnixDate), r.Updated.Format(time.UnixDate)})
 	}
 

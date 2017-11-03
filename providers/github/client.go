@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/cego/git-request-list/providers"
+	"github.com/cego/git-request-list/request"
 )
 
 // Client represents a Github pull-request source.
@@ -54,13 +55,13 @@ func init() {
 
 // GetRequests returns a slice of pull-requests visible to the Client c. Only pull-requests from the repositories whose
 // name is matched by repositoryFilter are returned.
-func (c *Client) GetRequests(repositoryFilter regexp.Regexp) ([]providers.Request, error) {
+func (c *Client) GetRequests(repositoryFilter regexp.Regexp) ([]request.Request, error) {
 	repositories, err := c.getRepositories(repositoryFilter)
 	if err != nil {
 		return nil, err
 	}
 
-	var result []providers.Request
+	var result []request.Request
 	for _, repository := range repositories {
 		requests, err := c.getRequests(repository)
 		if err != nil {
@@ -113,8 +114,8 @@ func (c *Client) getRepositories(filter regexp.Regexp) ([]string, error) {
 }
 
 // getRequests returns all pull-requests of the repository with the given name visible to c.
-func (c *Client) getRequests(repos string) ([]providers.Request, error) {
-	var result []providers.Request
+func (c *Client) getRequests(repos string) ([]request.Request, error) {
+	var result []request.Request
 
 	for next := "/repos/" + repos + "/pulls"; next != ""; {
 		resp, err := c.get(next)
@@ -132,7 +133,7 @@ func (c *Client) getRequests(repos string) ([]providers.Request, error) {
 		}
 
 		for _, r := range page {
-			result = append(result, providers.Request{
+			result = append(result, request.Request{
 				Repository: repos,
 				Name:       r.Name,
 				URL:        r.URL,

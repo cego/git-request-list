@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/cego/git-request-list/providers"
+	"github.com/cego/git-request-list/request"
 )
 
 // Client represents a Gitlab merge-request source.
@@ -55,8 +56,8 @@ func init() {
 
 // GetRequests returns a slice of merge-requests visible to the Client c. Only merge-requests from the repositories
 // whose name matches repositoryFilter are returned.
-func (c *Client) GetRequests(repositoryFilter regexp.Regexp) ([]providers.Request, error) {
-	var result []providers.Request
+func (c *Client) GetRequests(repositoryFilter regexp.Regexp) ([]request.Request, error) {
+	var result []request.Request
 
 	repositories, err := c.getRepositories(repositoryFilter)
 	if err != nil {
@@ -114,7 +115,7 @@ func (c *Client) getRepositories(filter regexp.Regexp) ([]repository, error) {
 }
 
 // getRequests returns all open merge-requests of the repository with the given ID visible to c.
-func (c *Client) getRequests(repos repository) ([]providers.Request, error) {
+func (c *Client) getRequests(repos repository) ([]request.Request, error) {
 
 	resp, err := c.get("HEAD", "/projects/"+strconv.Itoa(repos.ID)+"/merge_requests?state=opened")
 	if err != nil {
@@ -125,7 +126,7 @@ func (c *Client) getRequests(repos repository) ([]providers.Request, error) {
 		return nil, err
 	}
 
-	var result []providers.Request
+	var result []request.Request
 	for p := 1; p <= pageCount; p++ {
 		resp, err := c.get("GET", "/projects/"+strconv.Itoa(repos.ID)+"/merge_requests?state=opened&page="+strconv.Itoa(p))
 		if err != nil {
@@ -145,7 +146,7 @@ func (c *Client) getRequests(repos repository) ([]providers.Request, error) {
 				continue
 			}
 
-			result = append(result, providers.Request{
+			result = append(result, request.Request{
 				Repository: repos.Name,
 				Name:       r.Name,
 				URL:        r.URL,

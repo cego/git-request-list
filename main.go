@@ -6,9 +6,12 @@ import (
 	"log"
 	"sort"
 
-	"github.com/cego/git-request-list/formatters"
-	"github.com/cego/git-request-list/providers"
+	"github.com/cego/git-request-list/request"
 
+	"github.com/cego/git-request-list/formatters"
+	_ "github.com/cego/git-request-list/formatters/text"
+
+	"github.com/cego/git-request-list/providers"
 	_ "github.com/cego/git-request-list/providers/github"
 	_ "github.com/cego/git-request-list/providers/gitlab"
 )
@@ -27,7 +30,7 @@ func main() {
 
 	// Gather requests from configured sources
 
-	var requests []providers.Request
+	var requests []request.Request
 	for _, sConf := range conf.Sources {
 		source, err := providers.GetProvider(sConf.API, sConf.Host, sConf.Token, *verbose)
 		if err != nil {
@@ -63,6 +66,10 @@ func main() {
 		break
 	}
 
-	table := formatters.Table{}
-	fmt.Print(table.String(requests...))
+	formatter, err := formatters.GetFormatter("text", requests)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Print(formatter.String())
 }
