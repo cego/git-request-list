@@ -11,6 +11,7 @@ import (
 // config represents a fully parsed configuration file
 type config struct {
 	SortBy  string
+	Format  string
 	Sources []sourceConfig
 }
 
@@ -31,6 +32,7 @@ func readConfig(path string) (*config, error) {
 
 	var unmarshallTarget struct {
 		SortBy  string `yaml:"sort_by"`
+		Format  string `yaml:"format"`
 		Sources []struct {
 			API          string   `yaml:"api"`
 			Host         string   `yaml:"host"`
@@ -46,6 +48,7 @@ func readConfig(path string) (*config, error) {
 
 	c := config{
 		SortBy:  unmarshallTarget.SortBy,
+		Format:  unmarshallTarget.Format,
 		Sources: make([]sourceConfig, len(unmarshallTarget.Sources)),
 	}
 
