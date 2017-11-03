@@ -2,21 +2,13 @@ package providers
 
 import (
 	"regexp"
-	"time"
-)
 
-// Request represents a pull- or merge-request
-type Request struct {
-	Repository string
-	Name       string
-	URL        string
-	Created    time.Time
-	Updated    time.Time
-}
+	"github.com/cego/git-request-list/request"
+)
 
 // Provider is the common interface for all providers of pull- and merge-requests
 type Provider interface {
-	GetRequests(repositoryFilter regexp.Regexp) ([]Request, error)
+	GetRequests(repositoryFilter regexp.Regexp) ([]request.Request, error)
 }
 
 // ProviderFactory types a function for producing new Providers

@@ -6,6 +6,8 @@ import (
 	"log"
 	"sort"
 
+	"github.com/cego/git-request-list/request"
+
 	"github.com/cego/git-request-list/formatters"
 	"github.com/cego/git-request-list/providers"
 
@@ -27,7 +29,7 @@ func main() {
 
 	// Gather requests from configured sources
 
-	var requests []providers.Request
+	var requests []request.Request
 	for _, sConf := range conf.Sources {
 		source, err := providers.GetProvider(sConf.API, sConf.Host, sConf.Token, *verbose)
 		if err != nil {
