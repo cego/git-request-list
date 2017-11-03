@@ -9,8 +9,9 @@ import (
 	"github.com/cego/git-request-list/request"
 
 	"github.com/cego/git-request-list/formatters"
-	"github.com/cego/git-request-list/providers"
+	_ "github.com/cego/git-request-list/formatters/text"
 
+	"github.com/cego/git-request-list/providers"
 	_ "github.com/cego/git-request-list/providers/github"
 	_ "github.com/cego/git-request-list/providers/gitlab"
 )
@@ -65,6 +66,10 @@ func main() {
 		break
 	}
 
-	table := formatters.Table{}
-	fmt.Print(table.String(requests...))
+	formatter, err := formatters.GetFormatter("text", requests)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Print(formatter.String())
 }
