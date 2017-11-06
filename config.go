@@ -47,8 +47,8 @@ func readConfig(path string) (*config, error) {
 	}
 
 	c := config{
-		SortBy:  unmarshallTarget.SortBy,
-		Format:  unmarshallTarget.Format,
+		SortBy:  strings.ToLower(unmarshallTarget.SortBy),
+		Format:  strings.ToLower(unmarshallTarget.Format),
 		Sources: make([]sourceConfig, len(unmarshallTarget.Sources)),
 	}
 
@@ -59,7 +59,7 @@ func readConfig(path string) (*config, error) {
 		}
 
 		c.Sources[i] = sourceConfig{
-			API:          s.API,
+			API:          strings.ToLower(s.API),
 			Host:         s.Host,
 			Token:        s.Token,
 			Repositories: *re,
