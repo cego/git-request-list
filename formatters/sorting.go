@@ -1,40 +1,64 @@
 package formatters
 
 import (
+	"sort"
+
 	"github.com/cego/git-request-list/request"
 )
 
-// ByRepository implements sort.Interface for []request.Request based on Repository.
-type ByRepository []request.Request
+// byRepository implements sort.Interface for []request.Request based on Repository.
+type byRepository []request.Request
 
-func (rs ByRepository) Len() int           { return len(rs) }
-func (rs ByRepository) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
-func (rs ByRepository) Less(i, j int) bool { return rs[i].Repository < rs[j].Repository }
+func (rs byRepository) Len() int           { return len(rs) }
+func (rs byRepository) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
+func (rs byRepository) Less(i, j int) bool { return rs[i].Repository < rs[j].Repository }
 
-// ByName implements sort.Interface for []request.Request based on Name.
-type ByName []request.Request
+// byName implements sort.Interface for []request.Request based on Name.
+type byName []request.Request
 
-func (rs ByName) Len() int           { return len(rs) }
-func (rs ByName) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
-func (rs ByName) Less(i, j int) bool { return rs[i].Name < rs[j].Name }
+func (rs byName) Len() int           { return len(rs) }
+func (rs byName) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
+func (rs byName) Less(i, j int) bool { return rs[i].Name < rs[j].Name }
 
-// ByURL implements sort.Interface for []request.Request based on URL.
-type ByURL []request.Request
+// byURL implements sort.Interface for []request.Request based on URL.
+type byURL []request.Request
 
-func (rs ByURL) Len() int           { return len(rs) }
-func (rs ByURL) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
-func (rs ByURL) Less(i, j int) bool { return rs[i].URL < rs[j].URL }
+func (rs byURL) Len() int           { return len(rs) }
+func (rs byURL) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
+func (rs byURL) Less(i, j int) bool { return rs[i].URL < rs[j].URL }
 
-// ByCreated implements sort.Interface for []request.Request based on Created.
-type ByCreated []request.Request
+// byCreated implements sort.Interface for []request.Request based on Created.
+type byCreated []request.Request
 
-func (rs ByCreated) Len() int           { return len(rs) }
-func (rs ByCreated) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
-func (rs ByCreated) Less(i, j int) bool { return rs[i].Created.Before(rs[j].Created) }
+func (rs byCreated) Len() int           { return len(rs) }
+func (rs byCreated) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
+func (rs byCreated) Less(i, j int) bool { return rs[i].Created.Before(rs[j].Created) }
 
-// ByUpdated implements sort.Interface for []request.Request based on Updated.
-type ByUpdated []request.Request
+// byUpdated implements sort.Interface for []request.Request based on Updated.
+type byUpdated []request.Request
 
-func (rs ByUpdated) Len() int           { return len(rs) }
-func (rs ByUpdated) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
-func (rs ByUpdated) Less(i, j int) bool { return rs[i].Updated.Before(rs[j].Updated) }
+func (rs byUpdated) Len() int           { return len(rs) }
+func (rs byUpdated) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
+func (rs byUpdated) Less(i, j int) bool { return rs[i].Updated.Before(rs[j].Updated) }
+
+// Sort sorts requests by the property named by
+func Sort(requests []request.Request, by string) {
+	switch by {
+	case "name":
+		sort.Sort(byName(requests))
+		break
+	case "url":
+		sort.Sort(byURL(requests))
+		break
+	case "created":
+		sort.Sort(byCreated(requests))
+		break
+	case "updated":
+		sort.Sort(byUpdated(requests))
+		break
+	case "repository":
+		sort.Sort(byRepository(requests))
+	default:
+		break
+	}
+}
