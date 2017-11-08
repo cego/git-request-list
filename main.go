@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"sort"
 
 	"github.com/cego/git-request-list/request"
 
@@ -48,24 +47,7 @@ func main() {
 
 	// Output the requests
 
-	switch conf.SortBy {
-	case "name":
-		sort.Sort(formatters.ByName(requests))
-		break
-	case "url":
-		sort.Sort(formatters.ByURL(requests))
-		break
-	case "created":
-		sort.Sort(formatters.ByCreated(requests))
-		break
-	case "updated":
-		sort.Sort(formatters.ByUpdated(requests))
-		break
-	case "repository":
-	default:
-		sort.Sort(formatters.ByRepository(requests))
-		break
-	}
+	formatters.Sort(requests, conf.SortBy)
 
 	var formatter formatters.Formatter
 	if conf.Format == "" {
