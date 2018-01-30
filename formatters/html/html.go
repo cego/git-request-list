@@ -5,7 +5,6 @@ import (
 	"html/template"
 
 	"github.com/cego/git-request-list/formatters"
-	"github.com/cego/git-request-list/request"
 )
 
 // Table represents a HTML table containing pull- and merge-requests.
@@ -32,8 +31,8 @@ const htmlTemplate = `
         <td class="item-repository">{{.Repository}}</td>
         <td class="item-name">{{.Name}}</td>
         <td class="item-url">{{.URL}}</td>
-        <td class="item-created">{{.Created}}</td>
-        <td class="item-updated">{{.Updated}}</td>
+        <td class="item-created">{{(.Created.In $.Timezone).Format "2006-01-02 15:04"}}</td>
+        <td class="item-updated">{{(.Updated.In $.Timezone).Format "2006-01-02 15:04"}}</td>
       </tr>
       {{end}}
     </table>
@@ -44,11 +43,10 @@ const htmlTemplate = `
 func init() {
 	tmpl := template.Must(template.New("html").Parse(htmlTemplate))
 
-	factory := func(requests []request.Request) (formatters.Formatter, error) {
+	factory := func(arguments formatters.Arguments) (formatters.Formatter, error) {
 		// Compile htmlTemplate into buff
-		data := struct{ Requests []request.Request }{Requests: requests}
 		var buffer bytes.Buffer
-		err := tmpl.Execute(&buffer, data)
+		err := tmpl.Execute(&buffer, arguments)
 		if err != nil {
 			return nil, err
 		}

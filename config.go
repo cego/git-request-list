@@ -4,15 +4,17 @@ import (
 	"io/ioutil"
 	"regexp"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v2"
 )
 
 // config represents a fully parsed configuration file
 type config struct {
-	SortBy  string
-	Format  string
-	Sources []sourceConfig
+	SortBy   string
+	Format   string
+	Timezone *time.Location
+	Sources  []sourceConfig
 }
 
 // sourceConfig holds configuration parameters of a single source
@@ -31,9 +33,10 @@ func readConfig(path string) (*config, error) {
 	}
 
 	var unmarshallTarget struct {
-		SortBy  string `yaml:"sort_by"`
-		Format  string `yaml:"format"`
-		Sources []struct {
+		SortBy   string `yaml:"sort_by"`
+		Format   string `yaml:"format"`
+		Timezone string
+		Sources  []struct {
 			API          string   `yaml:"api"`
 			Host         string   `yaml:"host"`
 			Token        string   `yaml:"token"`
@@ -46,10 +49,19 @@ func readConfig(path string) (*config, error) {
 		return nil, err
 	}
 
+	timezone := time.Local
+	if unmarshallTarget.Timezone != "" {
+		timezone, err = time.LoadLocation(unmarshallTarget.Timezone)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	c := config{
-		SortBy:  strings.ToLower(unmarshallTarget.SortBy),
-		Format:  strings.ToLower(unmarshallTarget.Format),
-		Sources: make([]sourceConfig, len(unmarshallTarget.Sources)),
+		SortBy:   strings.ToLower(unmarshallTarget.SortBy),
+		Format:   strings.ToLower(unmarshallTarget.Format),
+		Timezone: timezone,
+		Sources:  make([]sourceConfig, len(unmarshallTarget.Sources)),
 	}
 
 	for i, s := range unmarshallTarget.Sources {

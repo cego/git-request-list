@@ -49,11 +49,16 @@ func main() {
 
 	formatters.Sort(requests, conf.SortBy)
 
+	arguments := formatters.Arguments{
+		Requests: requests,
+		Timezone: conf.Timezone,
+	}
+
 	var formatter formatters.Formatter
 	if conf.Format == "" {
-		formatter, err = formatters.GetFormatter("text", requests)
+		formatter, err = formatters.GetFormatter("text", arguments)
 	} else {
-		formatter, err = formatters.GetFormatter(conf.Format, requests)
+		formatter, err = formatters.GetFormatter(conf.Format, arguments)
 	}
 	if err != nil {
 		log.Fatal(err)
