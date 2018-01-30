@@ -2,7 +2,7 @@ package html
 
 import (
 	"bytes"
-	"text/template"
+	"html/template"
 
 	"github.com/cego/git-request-list/formatters"
 	"github.com/cego/git-request-list/request"
