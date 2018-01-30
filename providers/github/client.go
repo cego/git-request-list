@@ -25,7 +25,7 @@ type Client struct {
 // pullRequest serves as Unmarshal target type when reading Github API responses
 type pullRequest struct {
 	Name    string    `json:"title"`
-	URL     string    `json:"url"`
+	URL     string    `json:"html_url"`
 	Created time.Time `json:"created_at"`
 	Updated time.Time `json:"updated_at"`
 }
