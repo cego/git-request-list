@@ -36,3 +36,4 @@ Each source can have the following properties:
 At top-level, you can specify the following properties:
   - `sort_by: <string>`: The property to sort output by. Either `repository`, `name`, `state`, `url`, `created` or `updated`.
   - `format: <string>`: The format of the output. Either `text` or `html`. Defaults to `text`.
+  - `timezone: <string>`: A timezone to normalize all timestamp in. Default to local timezone.
