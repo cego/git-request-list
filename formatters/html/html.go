@@ -22,15 +22,13 @@ const htmlTemplate = `
       <tr>
         <th class="header-repository">Repository</th>
         <th class="header-name">Name</th>
-        <th class="header-url">URL</th>
         <th class="header-created">Created</th>
         <th class="header-updated">Updated</th>
       </tr>
       {{range .Requests}}
       <tr>
         <td class="item-repository">{{.Repository}}</td>
-        <td class="item-name">{{.Name}}</td>
-        <td class="item-url">{{.URL}}</td>
+        <td class="item-name"><a href="{{.URL}}">{{.Name}}</a></td>
         <td class="item-created">{{(.Created.In $.Timezone).Format "2006-01-02 15:04"}}</td>
         <td class="item-updated">{{(.Updated.In $.Timezone).Format "2006-01-02 15:04"}}</td>
       </tr>
