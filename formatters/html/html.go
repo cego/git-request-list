@@ -29,7 +29,7 @@ const htmlTemplate = `
       {{range .Requests}}
       <tr>
         <td class="item-repository">{{.Repository}}</td>
-        <td class="item-name"><a href="{{.URL}}">{{.Name}}</a></td>
+        <td class="item-name"><a target="_top" href="{{.URL}}">{{.Name}}</a></td>
         <td class="item-created">{{(.Created.In $.Timezone).Format "2006-01-02 15:04"}}</td>
         <td class="item-updated">{{(.Updated.In $.Timezone).Format "2006-01-02 15:04"}}</td>
       </tr>
